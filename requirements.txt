@@ -1,0 +1,7 @@
+pydantic
+fastapi[standard]
+faststream[kafka]
+pydantic-settings
+python-dotenv
+aiohttp
+aiochclient[aiohttp]
