@@ -10,6 +10,7 @@
 - **Kafka KRaft** — брокер без ZooKeeper, кластер из 3 узлов
 - **aiochclient** — async HTTP-клиент для ClickHouse
 - **Pydantic / pydantic-settings** — валидация данных и конфигурация
+- **uv** — управление зависимостями и виртуальным окружением
 
 ## Архитектура
 
@@ -67,7 +68,8 @@ event_service/
 ├── migrations/clickhouse/
 │   └── 001_create_events_table.sql
 ├── docker-compose.yml         # Kafka (3 узла) + Kafka UI + ClickHouse
-├── requirements.txt
+├── pyproject.toml             # зависимости проекта + dev-инструменты (uv)
+├── uv.lock                    # зафиксированные версии зависимостей
 └── .env
 ```
 
@@ -86,8 +88,10 @@ docker-compose up -d
 
 ### 2. Установить зависимости
 
+Зависимостями управляет [uv](https://docs.astral.sh/uv/). Команда создаёт виртуальное окружение `.venv` и ставит зафиксированные в `uv.lock` версии:
+
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 ### 3. Настроить окружение
@@ -113,6 +117,16 @@ uvicorn app.main:app --host 127.0.0.1 --port 8010 --reload
 ```
 
 Swagger UI доступен по адресу `http://127.0.0.1:8010/docs`.
+
+## Разработка
+
+Линтинг и форматирование — через [Ruff](https://docs.astral.sh/ruff/); конфигурация в `pyproject.toml` (секции `[tool.ruff]`). Ruff ставится вместе с dev-зависимостями при `uv sync`.
+
+```bash
+uv run ruff check .          # линтинг
+uv run ruff check . --fix    # линтинг + авто-исправления
+uv run ruff format .         # форматирование
+```
 
 ## API
 
