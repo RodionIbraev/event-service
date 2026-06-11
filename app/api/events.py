@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query, status
 
 from app.dependencies import get_event_publisher, get_clickhouse_client
 from app.messaging.publisher import EventPublisher
-from app.schemas.events import EventIn, EventAccepted, EventOut, EventStatsOut
+from app.schemas.events import EventInSchema, EventAcceptedSchema, EventOutSchema, EventStatsOutSchema
 from app.storage.clickhouse.client import ClickHouseClient
 
 router = APIRouter(prefix="/events", tags=["events"])
@@ -12,22 +12,22 @@ router = APIRouter(prefix="/events", tags=["events"])
 
 @router.post(
     "",
-    response_model=EventAccepted,
+    response_model=EventAcceptedSchema,
     status_code=status.HTTP_202_ACCEPTED,
 )
 async def create_event(
-    event: EventIn,
+    event: EventInSchema,
     publisher: EventPublisher = Depends(get_event_publisher),
-) -> EventAccepted:
+) -> EventAcceptedSchema:
     await publisher.publish_event(event)
 
-    return EventAccepted(
+    return EventAcceptedSchema(
         status="accepted",
         event_id=event.event_id,
     )
 
 
-@router.get("", response_model=list[EventOut])
+@router.get("", response_model=list[EventOutSchema])
 async def get_events(
     event_type: str | None = None,
     source: str | None = None,
@@ -35,7 +35,7 @@ async def get_events(
     date_to: datetime | None = None,
     limit: int = Query(default=100, ge=1, le=1000),
     clickhouse_client: ClickHouseClient = Depends(get_clickhouse_client),
-) -> list[EventOut]:
+) -> list[EventOutSchema]:
 
     return await clickhouse_client.get_events(
         event_type=event_type,
@@ -46,13 +46,13 @@ async def get_events(
     )
 
 
-@router.get("/stats", response_model=list[EventStatsOut])
+@router.get("/stats", response_model=list[EventStatsOutSchema])
 async def get_events_stats(
     source: str | None = None,
     date_from: datetime | None = None,
     date_to: datetime | None = None,
     clickhouse_client: ClickHouseClient = Depends(get_clickhouse_client),
-) -> list[EventStatsOut]:
+) -> list[EventStatsOutSchema]:
 
     return await clickhouse_client.get_events_stats(
         source=source,

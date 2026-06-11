@@ -1,6 +1,6 @@
 from faststream.kafka import KafkaBroker
 
-from app.schemas.events import EventIn
+from app.schemas.events import EventInSchema
 
 
 class EventRetransmitter:
@@ -12,7 +12,7 @@ class EventRetransmitter:
         self.broker = broker
         self.topic = topic
 
-    async def retransmit_event(self, event: EventIn) -> None:
+    async def retransmit_event(self, event: EventInSchema) -> None:
         await self.broker.publish(
             message=event.model_dump(mode="json"),
             topic=self.topic,
@@ -23,6 +23,6 @@ class EventRetransmitter:
             },
         )
 
-    async def retransmit_events(self, events: list[EventIn]) -> None:
+    async def retransmit_events(self, events: list[EventInSchema]) -> None:
         for event in events:
             await self.retransmit_event(event)

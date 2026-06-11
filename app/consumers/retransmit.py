@@ -3,7 +3,7 @@ from faststream.kafka import KafkaRouter
 
 from app.config import settings
 from app.dependencies import event_retransmitter
-from app.schemas.events import EventIn
+from app.schemas.events import EventInSchema
 
 
 retransmit_consumer_router = KafkaRouter()
@@ -17,7 +17,7 @@ retransmit_consumer_router = KafkaRouter()
     max_records=settings.clickhouse_batch_size,
     batch_timeout_ms=settings.kafka_batch_timeout_ms,
 )
-async def retransmit_events(events: list[EventIn], logger: Logger) -> None:
+async def retransmit_events(events: list[EventInSchema], logger: Logger) -> None:
     if not settings.retransmit_enabled:
         logger.info("Retransmission is disabled")
         return

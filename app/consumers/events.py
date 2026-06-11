@@ -5,7 +5,7 @@ from faststream.kafka import KafkaRouter
 
 from app.config import settings
 from app.dependencies import clickhouse_client, event_publisher
-from app.schemas.events import EventIn, EventRetryMessage
+from app.schemas.events import EventInSchema, EventRetryMessageSchema
 
 
 events_consumer_router = KafkaRouter()
@@ -19,7 +19,7 @@ events_consumer_router = KafkaRouter()
     max_records=settings.clickhouse_batch_size,
     batch_timeout_ms=settings.kafka_batch_timeout_ms,
 )
-async def handle_events(events: list[EventIn], logger: Logger) -> None:
+async def handle_events(events: list[EventInSchema], logger: Logger) -> None:
     logger.info(f"Events batch received from Kafka: {len(events)}")
 
     try:
@@ -53,7 +53,7 @@ async def handle_events(events: list[EventIn], logger: Logger) -> None:
     batch_timeout_ms=settings.kafka_batch_timeout_ms,
 )
 async def handle_retry_events(
-    retry_messages: list[EventRetryMessage],
+    retry_messages: list[EventRetryMessageSchema],
     logger: Logger,
 ) -> None:
     logger.info(f"Retry batch received from Kafka: {len(retry_messages)}")

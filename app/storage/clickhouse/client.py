@@ -5,7 +5,7 @@ from aiochclient import ChClient
 from aiohttp import ClientSession
 
 from app.config import settings
-from app.schemas.events import EventIn, EventOut, EventStatsOut
+from app.schemas.events import EventInSchema, EventOutSchema, EventStatsOutSchema
 
 
 class ClickHouseClient:
@@ -28,7 +28,7 @@ class ClickHouseClient:
         if self.session is not None:
             await self.session.close()
 
-    async def save_events(self, events: list[EventIn]) -> None:
+    async def save_events(self, events: list[EventInSchema]) -> None:
         if self.client is None:
             raise RuntimeError("ClickHouse client is not connected")
 
@@ -68,7 +68,7 @@ class ClickHouseClient:
             date_from: datetime | None = None,
             date_to: datetime | None = None,
             limit: int = 100,
-    ) -> list[EventOut]:
+    ) -> list[EventOutSchema]:
         if self.client is None:
             raise RuntimeError("ClickHouse client is not connected")
 
@@ -114,7 +114,7 @@ class ClickHouseClient:
         rows = await self.client.fetch(query)
 
         return [
-            EventOut(
+            EventOutSchema(
                 event_id=row["event_id"],
                 event_type=row["event_type"],
                 source=row["source"],
@@ -130,7 +130,7 @@ class ClickHouseClient:
             source: str | None = None,
             date_from: datetime | None = None,
             date_to: datetime | None = None,
-    ) -> list[EventStatsOut]:
+    ) -> list[EventStatsOutSchema]:
         if self.client is None:
             raise RuntimeError("ClickHouse client is not connected")
 
@@ -169,7 +169,7 @@ class ClickHouseClient:
         rows = await self.client.fetch(query)
 
         return [
-            EventStatsOut(
+            EventStatsOutSchema(
                 event_type=row["event_type"],
                 count=row["count"],
             )

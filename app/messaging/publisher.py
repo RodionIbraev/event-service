@@ -1,6 +1,6 @@
 from faststream.kafka import KafkaBroker
 
-from app.schemas.events import EventDLQMessage, EventIn, EventRetryMessage
+from app.schemas.events import EventDLQMessageSchema, EventInSchema, EventRetryMessageSchema
 
 
 class EventPublisher:
@@ -16,7 +16,7 @@ class EventPublisher:
         self.retry_topic = retry_topic
         self.dlq_topic = dlq_topic
 
-    async def publish_event(self, event: EventIn) -> None:
+    async def publish_event(self, event: EventInSchema) -> None:
         await self.broker.publish(
             message=event.model_dump(mode="json"),
             topic=self.events_topic,
@@ -24,11 +24,11 @@ class EventPublisher:
 
     async def publish_retry_event(
         self,
-        event: EventIn,
+        event: EventInSchema,
         retry_count: int,
         error: str,
     ) -> None:
-        retry_message = EventRetryMessage(
+        retry_message = EventRetryMessageSchema(
             event=event,
             retry_count=retry_count,
             error=self._short_error(error),
@@ -41,7 +41,7 @@ class EventPublisher:
 
     async def publish_retry_events(
         self,
-        events: list[EventIn],
+        events: list[EventInSchema],
         retry_count: int,
         error: str,
     ) -> None:
@@ -54,11 +54,11 @@ class EventPublisher:
 
     async def publish_dlq_event(
         self,
-        event: EventIn,
+        event: EventInSchema,
         retry_count: int,
         error: str,
     ) -> None:
-        dlq_message = EventDLQMessage(
+        dlq_message = EventDLQMessageSchema(
             event=event,
             retry_count=retry_count,
             error=self._short_error(error),
@@ -71,7 +71,7 @@ class EventPublisher:
 
     async def publish_dlq_events(
         self,
-        messages: list[EventRetryMessage],
+        messages: list[EventRetryMessageSchema],
         error: str,
     ) -> None:
         for message in messages:
