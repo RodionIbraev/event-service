@@ -1,0 +1,74 @@
+[project]
+name = "event-service"
+version = "0.1.0"
+description = "Event service"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic",
+    "pydantic-settings",
+    "python-dotenv",
+    "fastapi[standard]",
+    "faststream[kafka]",
+    "aiohttp",
+    "aiochclient[aiohttp]",
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+]
+
+[tool.uv]
+package = false
+
+# --- Ruff (линтер + форматтер) ---------------------------------------------
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+extend-exclude = [
+    ".git",
+    "__pycache__",
+    "migrations",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort (сортировка импортов)
+    "UP",     # pyupgrade (модернизация синтаксиса)
+    "B",      # flake8-bugbear (частые баги)
+    "C4",     # flake8-comprehensions
+    "SIM",    # flake8-simplify
+    "ASYNC",  # flake8-async (важно для async-сервиса)
+    "RUF",    # ruff-specific rules
+]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Cookie",
+    "fastapi.Form",
+    "fastapi.File",
+    "fastapi.Security",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "commands"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+docstring-code-format = true
